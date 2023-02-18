@@ -1,5 +1,6 @@
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
+import './my-piano.css'
 import { useContext } from 'react';
 
 import SoundfontProvider from '../../providers/soundfont-provider';
@@ -17,6 +18,10 @@ const keyboardShortcuts = KeyboardShortcuts.create({
     lastNote: noteRange.last,
     keyboardConfig: KeyboardShortcuts.HOME_ROW,
 });
+
+const colorNote = (midiNumber, color = 'green') => {
+    document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key')[midiNumber - noteRange.first].classList.add('green-note');
+};
 
 export default function MyPiano() {
     const { notes, setNotes } = useContext(PianoContext);
@@ -42,7 +47,10 @@ export default function MyPiano() {
                         setNotes(notes.concat(midiNumber));
                         playNote(midiNumber);
                     }}
-                    stopNote={stopNote}
+                    stopNote={(midiNumber) => {
+                        stopNote(midiNumber);
+                        colorNote(midiNumber);
+                    }}
                     disabled={isLoading}
                     keyboardShortcuts={keyboardShortcuts}
                 />
