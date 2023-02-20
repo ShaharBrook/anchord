@@ -13,11 +13,6 @@ const noteRange = {
     first: MidiNumbers.fromNote('c3'),
     last: MidiNumbers.fromNote('b5'),
 };
-const keyboardShortcuts = KeyboardShortcuts.create({
-    firstNote: noteRange.first,
-    lastNote: noteRange.last,
-    keyboardConfig: KeyboardShortcuts.HOME_ROW,
-});
 
 const colorNote = (midiNumber, color = 'green') => {
     document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key')[midiNumber - noteRange.first].classList.add('green-note');
