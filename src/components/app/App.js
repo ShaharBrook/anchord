@@ -11,18 +11,22 @@ import Navbar from './../navbar/navbar';
 
 export default function App() {
   const [leadingNote, setLeadingNote] = useState('');
+  const [scaleType, setScaleType] = useState({});
+
   const [notes, setNotes] = useState({});
   const validity = {
     scales: function (midiNumber) {
       // TODO: 
       const relativeDistance = (midiNumber - MidiNumbers.fromNote(leadingNote + '1')) % 12;
-      return [0, 2, 4, 5, 7, 9, 11].includes(relativeDistance);
+      return scaleType['formula'] .includes(relativeDistance);
     }
   };
 
   return (
     <div className="app">
-      <PianoContext.Provider value={{ notes, setNotes, validity, leadingNote, setLeadingNote }}>
+      <PianoContext.Provider value={{ notes, setNotes, validity, 
+      leadingNote, setLeadingNote,
+      scaleType, setScaleType }}>
         <h1>
           Anchord
         </h1>
