@@ -14,12 +14,12 @@ const noteRange = {
     last: MidiNumbers.fromNote('b5'),
 };
 
-const colorNote = (midiNumber, color = 'green') => {
-    document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key')[midiNumber - noteRange.first].classList.add('green-note');
+const colorNote = (midiNumber, isValid) => {
+    document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key')[midiNumber - noteRange.first].classList.add(`${isValid?'green':'red'}-note`);
 };
 
 export default function MyPiano() {
-    const { notes, setNotes } = useContext(PianoContext);
+    const { notes, setNotes, validity } = useContext(PianoContext);
 
     const firstNote = MidiNumbers.fromNote('c3');
     const lastNote = MidiNumbers.fromNote('b5');
@@ -39,12 +39,17 @@ export default function MyPiano() {
                     noteRange={noteRange}
                     width={600}
                     playNote={(midiNumber) => {
-                        setNotes(notes.concat(midiNumber));
                         playNote(midiNumber);
                     }}
                     stopNote={(midiNumber) => {
+                        const validityValue = validity['scales'](midiNumber);
+
+                        setNotes({
+                            ...notes,
+                            [midiNumber]: validityValue
+                        });
                         stopNote(midiNumber);
-                        colorNote(midiNumber);
+                        colorNote(midiNumber, validityValue);
                     }}
                     disabled={isLoading}
                     keyboardShortcuts={keyboardShortcuts}
