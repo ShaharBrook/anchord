@@ -1,19 +1,83 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import PianoContext from './../../context/piano-context';
+import { reset } from '../my-piano/my-piano';
 
-const NOTES = ['c','c#','d','d#','e','f','f#','g','g#','a','a#','b'];
+const NOTES = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+
+const scaleModifications = (baseScale, modifications) => {
+    const newScale = baseScale.slice(0);
+    modifications.forEach(([index, diff]) => {
+        newScale[index - 1] += diff;
+    })
+    return newScale;
+}
+
+const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
+const MINOR_SCALE = scaleModifications(MAJOR_SCALE, [[3, -1], [6, -1], [7, -1]]);
 const ScaleTypes = [{
-    text: 'Aeolien',
-    formula: [0, 2, 4, 5, 7, 9, 11]
+    text: 'Ionian',
+    formula: MAJOR_SCALE
+},
+{
+    text: 'Dorian',
+    formula: scaleModifications(MINOR_SCALE, [[6, 1]])
+},
+{
+    text: 'Phrygian',
+    formula: scaleModifications(MINOR_SCALE, [[2, -1]])
+},
+{
+    text: 'Lydian',
+    formula: scaleModifications(MAJOR_SCALE, [[4, 1]])
+},
+{
+    text: 'Mixolydian',
+    formula: scaleModifications(MAJOR_SCALE, [[7, -1]])
+},
+{
+    text: 'Aeolian',
+    formula: MINOR_SCALE
+},
+{
+    text: 'Locrian',
+    formula: scaleModifications(MINOR_SCALE, [[2, -1],[5,-1]])
 }];
 
+
+
 export default function Scales() {
-    const { leadingNote, setLeadingNote, scaleType, setScaleType } = useContext(PianoContext);
+    const { leadingNote, setLeadingNote,
+        scaleType, setScaleType,
+        notes, setNotes } = useContext(PianoContext);
+
+    const [isDone, setIsDone] = useState(false);
+
+    const resetNotes = () => {
+        setNotes({});
+        reset();
+        setLeadingNote(NOTES[Math.floor(Math.random() * NOTES.length)]);
+        setScaleType(ScaleTypes[Math.floor(Math.random() * ScaleTypes.length)]);
+    }
 
     useEffect(() => {
-        setLeadingNote(NOTES[Math.floor(Math.random()*NOTES.length)]);
-        setScaleType(ScaleTypes[Math.floor(Math.random()*ScaleTypes.length)]);
+        resetNotes();
     }, []);
 
-    return <div>{leadingNote} {scaleType['text']}</div>
+    useEffect(() => {
+        let uniqueNotes = new Set();
+        for (const note of Object.entries(notes).filter(([_, validityValue]) => validityValue).map(([midiNumber, _]) => (midiNumber + 12) % 12)) {
+            uniqueNotes.add(uniqueNotes.size);
+
+            if (uniqueNotes.size === scaleType['formula'].length) {
+                setIsDone(true);
+                return;
+            }
+        }
+
+        setIsDone(false);
+    }, [notes])
+
+    return <h1>{leadingNote} {scaleType['text']}
+        {isDone && <button onClick={resetNotes}>reset</button>}
+    </h1>
 }

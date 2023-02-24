@@ -18,6 +18,14 @@ const colorNote = (midiNumber, isValid) => {
     document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key')[midiNumber - noteRange.first].classList.add(`${isValid?'green':'red'}-note`);
 };
 
+export const reset = () => {
+    document.querySelectorAll('.ReactPiano__Keyboard .ReactPiano__Key').forEach(element => {
+        element.classList.remove(`green-note`);
+        element.classList.remove(`red-note`);
+    });
+
+}
+
 export default function MyPiano() {
     const { notes, setNotes, validity } = useContext(PianoContext);
 
