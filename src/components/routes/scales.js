@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import PianoContext from './../../context/piano-context';
 import { reset } from '../my-piano/my-piano';
 
-const NOTES = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Ab', 'Bb', 'Db', 'Eb', 'Gb'];
 
 const scaleModifications = (baseScale, modifications) => {
     const newScale = baseScale.slice(0);
