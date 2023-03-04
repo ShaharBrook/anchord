@@ -40,7 +40,7 @@ const ScaleTypes = [{
 },
 {
     text: 'Locrian',
-    formula: scaleModifications(MINOR_SCALE, [[2, -1],[5,-1]])
+    formula: scaleModifications(MINOR_SCALE, [[2, -1], [5, -1]])
 }];
 
 
@@ -48,7 +48,8 @@ const ScaleTypes = [{
 export default function Scales() {
     const { leadingNote, setLeadingNote,
         scaleType, setScaleType,
-        notes, setNotes } = useContext(PianoContext);
+        notes, setNotes,
+        setPage } = useContext(PianoContext);
 
     const [isDone, setIsDone] = useState(false);
 
@@ -61,14 +62,16 @@ export default function Scales() {
 
     useEffect(() => {
         resetNotes();
+        setPage('scales');
+        console.log('scales');
     }, []);
 
     useEffect(() => {
         let uniqueNotes = new Set();
-        for (const note of Object.entries(notes).filter(([_, validityValue]) => validityValue).map(([midiNumber, _]) => (midiNumber + 12) % 12)) {
-            uniqueNotes.add(uniqueNotes.size);
-
-            if (uniqueNotes.size === scaleType['formula'].length) {
+        const normaliziedNotes = Object.entries(notes).filter(([_, validityValue]) => validityValue).map(([midiNumber, _]) => (parseInt(midiNumber) + 12) % 12);
+        for (const note of normaliziedNotes) {
+            uniqueNotes.add(note);
+            if (scaleType['formula'] && uniqueNotes.size === scaleType['formula'].length) {
                 setIsDone(true);
                 return;
             }
