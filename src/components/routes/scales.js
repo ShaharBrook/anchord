@@ -63,7 +63,6 @@ export default function Scales() {
     useEffect(() => {
         resetNotes();
         setPage('scales');
-        console.log('scales');
     }, []);
 
     useEffect(() => {

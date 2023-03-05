@@ -7,10 +7,10 @@ export default function Navbar() {
             <Link to="/scales">Scales</Link>
         </div>
         <div>
-            <Link to="/chords">Chords</Link>
+            <Link to="/intervals">Intervals</Link>
         </div>
         <div>
-            <Link to="/intervals">Intervals</Link>
+            <Link to="/chords">Chords</Link>
         </div>
     </nav>
 }

@@ -24,7 +24,6 @@ export default function Intervals() {
     useEffect(() => {
         resetNotes();
         setPage('intervals');
-        console.log('intervals');
     }, []);
 
     useEffect(() => {

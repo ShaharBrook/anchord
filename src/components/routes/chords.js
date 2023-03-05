@@ -9,11 +9,9 @@ export default function Chords() {
     const location = useLocation();
 
     useEffect(() => {
-        console.log(location.pathname);
         setPage('chords');
-        // Send request to your server to increment page view count
     }, [location]);
 
 
-    return <div>Chords</div>
+    return <div><h1>Chords are not supported yet!</h1></div>
 }
