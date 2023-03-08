@@ -1,7 +1,7 @@
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import './my-piano.css'
-import { useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import SoundfontProvider from '../../providers/soundfont-provider';
 import PianoContext from './../../context/piano-context';
@@ -27,9 +27,11 @@ export const reset = () => {
 }
 
 export default function MyPiano() {
-    const { notes, setNotes, validity, page } = useContext(PianoContext);
+    const { notes, setNotes, validity, page,
+        chordType, scaleType, intervalTypeIndex } = useContext(PianoContext);
+    const [inputs, setInputs] = useState(null);
 
-    const playNoteRef = (midiNumber) => {
+    const playNoteCallback = (midiNumber) => {
         // playNote(midiNumber);
         const validityValue = validity[page](midiNumber);
 
@@ -41,7 +43,7 @@ export default function MyPiano() {
 
     };
 
-    const stopNoteRef = (midiNumber) => {
+    const stopNoteCallback = (midiNumber) => {
         const validityValue = validity[page](midiNumber);
         colorNote(midiNumber, validityValue);
 
@@ -56,24 +58,37 @@ export default function MyPiano() {
         keyboardConfig: KeyboardShortcuts.QWERTY_ROW.filter(({ natural }) => natural !== '[').concat(KeyboardShortcuts.BOTTOM_ROW)
     });
 
+    const midiCallback = ({ data }) => {
+        const [command, note, velocity] = data;
+        if (command === 144) {
+            playNoteCallback(note);
+        } else {
+            stopNoteCallback(note);
+        }
+    };
+
     useEffect(() => {
+        if (!page) return;
+
         navigator.requestMIDIAccess().then((midiAccess) => {
-
-            const { inputs } = midiAccess;
-
-            console.log(inputs);
-            console.log(inputs[0]);
-            console.log(inputs[1]);
-
-            inputs.forEach((input) => {
-                input.addEventListener('midimessage', ({ data }) => {
-                    const [command, note, velocity] = data;
-                    console.log({ command, note, velocity });
-                    playNoteRef('' + note);
-                })
-            });
+            setInputs(midiAccess.inputs);
         });
-    }, []);
+
+    }, [page]);
+
+    useEffect(() => {
+        if (!inputs) return;
+
+        inputs.forEach((input) => {
+            input.onmidimessage = (message) => midiCallback(message);
+        });
+
+        return () => {
+            inputs.forEach((input) => {
+                input.onmidimessage = () => { };
+            });
+        }
+    }, [inputs, chordType, scaleType, intervalTypeIndex, notes]);
 
     return (
         <SoundfontProvider
@@ -84,8 +99,8 @@ export default function MyPiano() {
                 <Piano
                     noteRange={noteRange}
                     width={600}
-                    playNote={playNoteRef}
-                    stopNote={stopNoteRef}
+                    playNote={playNoteCallback}
+                    stopNote={stopNoteCallback}
                     disabled={isLoading}
                     keyboardShortcuts={keyboardShortcuts}
                 />
