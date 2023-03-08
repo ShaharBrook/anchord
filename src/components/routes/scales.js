@@ -4,7 +4,7 @@ import { reset } from '../my-piano/my-piano';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'Ab', 'Bb', 'Db', 'Eb', 'Gb'];
 
-const scaleModifications = (baseScale, modifications) => {
+export const scaleModifications = (baseScale, modifications) => {
     const newScale = baseScale.slice(0);
     modifications.forEach(([index, diff]) => {
         newScale[index - 1] += diff;

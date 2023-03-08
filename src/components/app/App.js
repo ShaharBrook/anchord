@@ -8,8 +8,18 @@ import MyRoutes, { defaultRoute } from '../routes/routes';
 
 export default function App() {
   const [leadingNote, setLeadingNote] = useState('');
+
   const [scaleType, setScaleType] = useState({});
+
+  const [chordType, setChordType] = useState({});
+  const [triadTypes, setTriadTypes] = useState({});
+  const [seventhTypes, setSeventhTypes] = useState({});
+  const [ninthTypes, setNinthTypes] = useState({});
+  const [eleventhTypes, setEleventhTypes] = useState({});
+  const [thirteenthTypes, setThirteenthTypes] = useState({});
+
   const [intervalTypeIndex, setIntervalTypeIndex] = useState(0);
+
   const [notes, setNotes] = useState({});
   const [page, setPage] = useState(defaultRoute);
 
@@ -23,17 +33,28 @@ export default function App() {
       return relativeDistance === intervalTypeIndex + 1;
     },
     chords: function (midiNumber) {
-      return true;
+      const relativeDistance = (midiNumber - MidiNumbers.fromNote(leadingNote + '1')) % 12;
+      return chordType['intervals'].includes(relativeDistance);
     }
   };
 
   return (
     <div className="app">
       <PianoContext.Provider value={{
-        notes, setNotes, validity,
         leadingNote, setLeadingNote,
+
         scaleType, setScaleType,
+
+        chordType, setChordType,
+        triadTypes, setTriadTypes,
+        seventhTypes, setSeventhTypes,
+        ninthTypes, setNinthTypes,
+        eleventhTypes, setEleventhTypes,
+        thirteenthTypes, setThirteenthTypes,
+
         intervalTypeIndex, setIntervalTypeIndex,
+
+        notes, setNotes, validity,
         page, setPage
       }}>
         <h1>

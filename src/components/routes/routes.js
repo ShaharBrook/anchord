@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Chords from './chords';
+import Chords from './chords/chords';
 import Scales from './scales';
 import Intervals from './intervals';
 
