@@ -33,7 +33,8 @@ export default function App() {
       return relativeDistance === intervalTypeIndex + 1;
     },
     chords: function (midiNumber) {
-      return true;
+      const relativeDistance = (midiNumber - MidiNumbers.fromNote(leadingNote + '1')) % 12;
+      return chordType['intervals'].includes(relativeDistance);
     }
   };
 
@@ -44,12 +45,12 @@ export default function App() {
 
         scaleType, setScaleType,
 
-        chordType, setChordType, 
+        chordType, setChordType,
         triadTypes, setTriadTypes,
         seventhTypes, setSeventhTypes,
         ninthTypes, setNinthTypes,
         eleventhTypes, setEleventhTypes,
-        thirteenthTypes, setThirteenthTypes, 
+        thirteenthTypes, setThirteenthTypes,
 
         intervalTypeIndex, setIntervalTypeIndex,
 
