@@ -1,7 +1,7 @@
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import './my-piano.css'
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import SoundfontProvider from '../../providers/soundfont-provider';
 import PianoContext from './../../context/piano-context';
@@ -36,6 +36,24 @@ export default function MyPiano() {
         lastNote: lastNote,
         keyboardConfig: KeyboardShortcuts.QWERTY_ROW.filter(({ natural }) => natural !== '[').concat(KeyboardShortcuts.BOTTOM_ROW)
     });
+
+    useEffect(() => {
+        navigator.requestMIDIAccess().then((midiAccess) => {
+
+            const { inputs } = midiAccess;
+
+            console.log(inputs);
+            console.log(inputs[0]);
+            console.log(inputs[1]);
+
+            inputs.forEach((input) => {
+                input.addEventListener('midimessage', ({ data }) => {
+                    const [command, note, velocity] = data;
+                    console.log({ command, note, velocity });
+                })
+            });
+        });
+    }, []);
 
     return (
         <SoundfontProvider
