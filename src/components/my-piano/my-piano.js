@@ -31,8 +31,11 @@ export default function MyPiano() {
         chordType, scaleType, intervalTypeIndex } = useContext(PianoContext);
     const [inputs, setInputs] = useState(null);
 
-    const playNoteCallback = (midiNumber) => {
-        // playNote(midiNumber);
+    let playNoteMusic = null;
+    let stopNoteMusic = null;
+
+    const playNoteCallback = (playNote) => (midiNumber) => {
+        playNote(midiNumber);
         const validityValue = validity[page](midiNumber);
 
         setNotes({
@@ -43,7 +46,7 @@ export default function MyPiano() {
 
     };
 
-    const stopNoteCallback = (midiNumber) => {
+    const stopNoteCallback = (stopNote) => (midiNumber) => {
         const validityValue = validity[page](midiNumber);
         colorNote(midiNumber, validityValue);
 
@@ -61,9 +64,9 @@ export default function MyPiano() {
     const midiCallback = ({ data }) => {
         const [command, note, velocity] = data;
         if (command === 144) {
-            playNoteCallback(note);
+            playNoteCallback(playNoteMusic)(note);
         } else {
-            stopNoteCallback(note);
+            stopNoteCallback(stopNoteMusic)(note);
         }
     };
 
@@ -95,16 +98,20 @@ export default function MyPiano() {
             instrumentName="acoustic_grand_piano"
             audioContext={audioContext}
             hostname={soundfontHostname}
-            render={({ isLoading, playNote, stopNote }) => (
-                <Piano
-                    noteRange={noteRange}
-                    width={600}
-                    playNote={playNoteCallback}
-                    stopNote={stopNoteCallback}
-                    disabled={isLoading}
-                    keyboardShortcuts={keyboardShortcuts}
-                />
-            )}
+            render={({ isLoading, playNote, stopNote }) => {
+                if (!playNoteMusic) playNoteMusic = playNote;
+                if (!stopNoteMusic) stopNoteMusic = stopNote;
+                return (
+                    <Piano
+                        noteRange={noteRange}
+                        width={600}
+                        playNote={playNoteCallback(playNote)}
+                        stopNote={stopNoteCallback(stopNote)}
+                        disabled={isLoading}
+                        keyboardShortcuts={keyboardShortcuts}
+                    />
+                )
+            }}
         />
     );
 }
