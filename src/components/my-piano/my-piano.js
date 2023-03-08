@@ -1,7 +1,7 @@
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 import './my-piano.css'
-import { useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import SoundfontProvider from '../../providers/soundfont-provider';
 import PianoContext from './../../context/piano-context';
@@ -27,7 +27,31 @@ export const reset = () => {
 }
 
 export default function MyPiano() {
-    const { notes, setNotes, validity, page } = useContext(PianoContext);
+    const { notes, setNotes, validity, page,
+        chordType, scaleType, intervalTypeIndex } = useContext(PianoContext);
+    const [inputs, setInputs] = useState(null);
+
+    let playNoteMusic = null;
+    let stopNoteMusic = null;
+
+    const playNoteCallback = (playNote) => (midiNumber) => {
+        playNote(midiNumber);
+        const validityValue = validity[page](midiNumber);
+
+        setNotes({
+            ...notes,
+            [midiNumber]: validityValue
+        });
+        colorNote(midiNumber, validityValue);
+
+    };
+
+    const stopNoteCallback = (stopNote) => (midiNumber) => {
+        const validityValue = validity[page](midiNumber);
+        colorNote(midiNumber, validityValue);
+
+        // stopNote(midiNumber);
+    };
 
     const firstNote = MidiNumbers.fromNote('c3');
     const lastNote = MidiNumbers.fromNote('b5');
@@ -37,36 +61,57 @@ export default function MyPiano() {
         keyboardConfig: KeyboardShortcuts.QWERTY_ROW.filter(({ natural }) => natural !== '[').concat(KeyboardShortcuts.BOTTOM_ROW)
     });
 
+    const midiCallback = ({ data }) => {
+        const [command, note, velocity] = data;
+        if (command === 144) {
+            playNoteCallback(playNoteMusic)(note);
+        } else {
+            stopNoteCallback(stopNoteMusic)(note);
+        }
+    };
+
+    useEffect(() => {
+        if (!page) return;
+
+        navigator.requestMIDIAccess().then((midiAccess) => {
+            setInputs(midiAccess.inputs);
+        });
+
+    }, [page]);
+
+    useEffect(() => {
+        if (!inputs) return;
+
+        inputs.forEach((input) => {
+            input.onmidimessage = (message) => midiCallback(message);
+        });
+
+        return () => {
+            inputs.forEach((input) => {
+                input.onmidimessage = () => { };
+            });
+        }
+    }, [inputs, chordType, scaleType, intervalTypeIndex, notes]);
+
     return (
         <SoundfontProvider
             instrumentName="acoustic_grand_piano"
             audioContext={audioContext}
             hostname={soundfontHostname}
-            render={({ isLoading, playNote, stopNote }) => (
-                <Piano
-                    noteRange={noteRange}
-                    width={600}
-                    playNote={(midiNumber) => {
-                        playNote(midiNumber);
-                        const validityValue = validity[page](midiNumber);
-
-                        setNotes({
-                            ...notes,
-                            [midiNumber]: validityValue
-                        });
-                        colorNote(midiNumber, validityValue);
-
-                    }}
-                    stopNote={(midiNumber) => {
-                        const validityValue = validity[page](midiNumber);
-                        colorNote(midiNumber, validityValue);
-
-                        stopNote(midiNumber);
-                    }}
-                    disabled={isLoading}
-                    keyboardShortcuts={keyboardShortcuts}
-                />
-            )}
+            render={({ isLoading, playNote, stopNote }) => {
+                if (!playNoteMusic) playNoteMusic = playNote;
+                if (!stopNoteMusic) stopNoteMusic = stopNote;
+                return (
+                    <Piano
+                        noteRange={noteRange}
+                        width={600}
+                        playNote={playNoteCallback(playNote)}
+                        stopNote={stopNoteCallback(stopNote)}
+                        disabled={isLoading}
+                        keyboardShortcuts={keyboardShortcuts}
+                    />
+                )
+            }}
         />
     );
 }
