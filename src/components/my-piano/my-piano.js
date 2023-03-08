@@ -48,16 +48,20 @@ export default function MyPiano() {
                     width={600}
                     playNote={(midiNumber) => {
                         playNote(midiNumber);
-                    }}
-                    stopNote={(midiNumber) => {
                         const validityValue = validity[page](midiNumber);
 
                         setNotes({
                             ...notes,
                             [midiNumber]: validityValue
                         });
-                        stopNote(midiNumber);
                         colorNote(midiNumber, validityValue);
+
+                    }}
+                    stopNote={(midiNumber) => {
+                        const validityValue = validity[page](midiNumber);
+                        colorNote(midiNumber, validityValue);
+
+                        stopNote(midiNumber);
                     }}
                     disabled={isLoading}
                     keyboardShortcuts={keyboardShortcuts}
