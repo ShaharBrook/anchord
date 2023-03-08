@@ -29,6 +29,25 @@ export const reset = () => {
 export default function MyPiano() {
     const { notes, setNotes, validity, page } = useContext(PianoContext);
 
+    const playNoteRef = (midiNumber) => {
+        // playNote(midiNumber);
+        const validityValue = validity[page](midiNumber);
+
+        setNotes({
+            ...notes,
+            [midiNumber]: validityValue
+        });
+        colorNote(midiNumber, validityValue);
+
+    };
+
+    const stopNoteRef = (midiNumber) => {
+        const validityValue = validity[page](midiNumber);
+        colorNote(midiNumber, validityValue);
+
+        // stopNote(midiNumber);
+    };
+
     const firstNote = MidiNumbers.fromNote('c3');
     const lastNote = MidiNumbers.fromNote('b5');
     const keyboardShortcuts = KeyboardShortcuts.create({
@@ -50,6 +69,7 @@ export default function MyPiano() {
                 input.addEventListener('midimessage', ({ data }) => {
                     const [command, note, velocity] = data;
                     console.log({ command, note, velocity });
+                    playNoteRef('' + note);
                 })
             });
         });
@@ -64,23 +84,8 @@ export default function MyPiano() {
                 <Piano
                     noteRange={noteRange}
                     width={600}
-                    playNote={(midiNumber) => {
-                        playNote(midiNumber);
-                        const validityValue = validity[page](midiNumber);
-
-                        setNotes({
-                            ...notes,
-                            [midiNumber]: validityValue
-                        });
-                        colorNote(midiNumber, validityValue);
-
-                    }}
-                    stopNote={(midiNumber) => {
-                        const validityValue = validity[page](midiNumber);
-                        colorNote(midiNumber, validityValue);
-
-                        stopNote(midiNumber);
-                    }}
+                    playNote={playNoteRef}
+                    stopNote={stopNoteRef}
                     disabled={isLoading}
                     keyboardShortcuts={keyboardShortcuts}
                 />
