@@ -108,6 +108,8 @@ const initDict = (dict) => {
 export default function Chords() {
     const { leadingNote, setLeadingNote,
 
+        autoProceeding,
+
         chordType, setChordType,
         triadTypes, setTriadTypes,
         seventhTypes, setSeventhTypes,
@@ -157,12 +159,13 @@ export default function Chords() {
             uniqueNotes.add(note);
             if (chordType['intervals'] && uniqueNotes.size === chordType['intervals'].length) {
                 setIsDone(true);
+                if (autoProceeding) setTimeout(resetNotes, 1300);
                 return;
             }
         }
 
         setIsDone(false);
-    }, [notes]);
+    }, [notes, autoProceeding]);
 
     const toggleTriad = (triad) => () => {
         setTriadTypes({

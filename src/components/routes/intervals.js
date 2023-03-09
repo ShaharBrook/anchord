@@ -8,6 +8,9 @@ const IntervalTypes = ['Minor Second', 'Major Second', 'Minor Third', 'Major Thi
 export default function Intervals() {
 
     const { leadingNote, setLeadingNote,
+
+        autoProceeding,
+
         intervalTypeIndex, setIntervalTypeIndex,
         notes, setNotes,
         setPage } = useContext(PianoContext);
@@ -34,14 +37,18 @@ export default function Intervals() {
 
             if (uniqueNotes.size === 1) {
                 setIsDone(true);
+                if (autoProceeding) setTimeout(resetNotes, 1300);
                 return;
             }
         }
 
         setIsDone(false);
-    }, [notes])
+    }, [notes, autoProceeding])
 
     return <h1>{leadingNote} {IntervalTypes[intervalTypeIndex]}
-        {isDone && <button onClick={resetNotes}>reset</button>}
+        <button
+            className={isDone ? 'selected' : 'not-selected'}
+            onClick={resetNotes}>reset
+        </button>
     </h1>
 }

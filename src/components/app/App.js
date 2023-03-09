@@ -9,6 +9,8 @@ import MyRoutes, { defaultRoute } from '../routes/routes';
 export default function App() {
   const [leadingNote, setLeadingNote] = useState('');
 
+  const [autoProceeding, setAutoProceeding] = useState(true);
+
   const [scaleType, setScaleType] = useState({});
 
   const [chordType, setChordType] = useState({});
@@ -43,6 +45,8 @@ export default function App() {
       <PianoContext.Provider value={{
         leadingNote, setLeadingNote,
 
+        autoProceeding, setAutoProceeding,
+
         scaleType, setScaleType,
 
         chordType, setChordType,
@@ -60,6 +64,12 @@ export default function App() {
         <h1>
           Anchord
         </h1>
+        <div className='main-menu'>
+          <button 
+            onClick={() => {setAutoProceeding(!autoProceeding)}}
+            className={autoProceeding ? 'selected' : 'not-selected'}
+          >auto proceed</button>
+        </div>
         <MyRoutes />
         <MyPiano />
       </PianoContext.Provider>

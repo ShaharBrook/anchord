@@ -47,6 +47,9 @@ const ScaleTypes = [{
 
 export default function Scales() {
     const { leadingNote, setLeadingNote,
+
+        autoProceeding,
+
         scaleType, setScaleType,
         notes, setNotes,
         setPage } = useContext(PianoContext);
@@ -72,14 +75,18 @@ export default function Scales() {
             uniqueNotes.add(note);
             if (scaleType['formula'] && uniqueNotes.size === scaleType['formula'].length) {
                 setIsDone(true);
+                if (autoProceeding) setTimeout(resetNotes, 1300);
                 return;
             }
         }
 
         setIsDone(false);
-    }, [notes])
+    }, [notes, autoProceeding])
 
     return <h1>{leadingNote} {scaleType['text']}
-        {isDone && <button onClick={resetNotes}>reset</button>}
+        <button
+            className={isDone ? 'selected' : 'not-selected'}
+            onClick={resetNotes}>reset
+        </button>
     </h1>
 }
